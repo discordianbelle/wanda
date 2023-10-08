@@ -1,9 +1,19 @@
 # Pruning LLMs by Weights and Activations
 Official PyTorch implementation of **Wanda** (Pruning by **W**eights **and a**ctivations), as presented in our paper:
 
-[A Simple and Effective Pruning Approach for Large Language Models](https://arxiv.org/abs/2306.11695)  
-[Mingjie Sun*](https://eric-mingjie.github.io/), [Zhuang Liu*](https://liuzhuang13.github.io/), [Anna Bair](https://annaebair.github.io/), [J. Zico Kolter](http://zicokolter.com/) (* indicates equal contribution)  
-Carnegie Mellon University, Meta AI Research and Bosch Center for AI  
+**A Simple and Effective Pruning Approach for Large Language Models** </br>
+*Mingjie Sun\*, Zhuang Liu\*, Anna Bair, J. Zico Kolter* (* indicates equal contribution) <br>
+Carnegie Mellon University, Meta AI Research and Bosch Center for AI  <br>
+[Paper](https://arxiv.org/abs/2306.11695) - [Project page](https://eric-mingjie.github.io/wanda/home.html)
+
+```bibtex
+@article{sun2023wanda,
+  title={A Simple and Effective Pruning Approach for Large Language Models}, 
+  author={Sun, Mingjie and Liu, Zhuang and Bair, Anna and Kolter, J. Zico},
+  year={2023},
+  journal={arXiv preprint arXiv:2306.11695}
+}
+```
 
 --- 
 <p align="center">
@@ -17,6 +27,7 @@ Compared to magnitude pruning which removes weights solely based on their magnit
 - [x] (9.22.2023) Add [support](https://github.com/locuslab/wanda#pruning-llama-2) for LLaMA-2.
 - [x] (9.22.2023) Add [code](https://github.com/locuslab/wanda#ablation-on-obs-weight-update) to reproduce the ablation study on OBS weight update in the paper.
 - [x] (10.6.2023) Add new [support](https://github.com/locuslab/wanda#ablation-on-obs-weight-update) for the weight update analysis in the ablation study. Feel free to try it out!
+- [x] (10.6.2023) Add [support](https://github.com/locuslab/wanda#zero-shot-evaluation) for zero-shot evaluation.
 
 ## Setup
 Installation instructions can be found in [INSTALL.md](INSTALL.md).
@@ -91,7 +102,14 @@ done
 ```
 Here `ablate_{mag/wanda}_{seq/iter}` means that we use magnitude pruning or wanda to obtain the pruned mask at each layer, then apply weight update procedure with either a sequential style or an iterative style every 128 input channels. For details, please see Section 5 of our [paper](https://arxiv.org/abs/2306.11695).
 
-For pruning image classifiers, see directory [image_classifiers](image_classifiers) for details.
+### Zero-Shot Evaluation
+For evaluating zero-shot tasks, we modify the [EleutherAI LM Harness](https://github.com/EleutherAI/lm-evaluation-harness/tree/master) framework so that it could evaluate pruned LLM models. We provide the modified repo in [this link](https://drive.google.com/file/d/1zugbLyGZKsH1L19L9biHLfaGGFnEc7XL/view?usp=sharing). Make sure to download, extract and install this custom `lm_eval` package from the source code.
+
+For reproducibility, we used [commit `df3da98`](https://github.com/EleutherAI/lm-evaluation-harness/tree/df3da98c5405deafd519c2ddca52bb7c3fe36bef) on the main branch. All tasks were evaluated on task version of 0 except for BoolQ, where the task version is 1.
+
+On a high level, the functionality we provide is adding two arguments `pretrained_model` and `tokenizer` in this [function](https://github.com/EleutherAI/lm-evaluation-harness/blob/master/lm_eval/evaluator.py#L17). We can then call this `simple_evaluate` function API from our [codebase](https://github.com/locuslab/wanda/blob/main/lib/eval.py#L148) to evaluate sparse pruned LLMs. To evaluate zero-shot tasks in addition to the WikiText perplexity, pass the `--eval_zero_shot` argument. 
+
+Last, for pruning image classifiers, see directory [image_classifiers](image_classifiers) for details.
 
 ## Acknowledgement
 This repository is build upon the [SparseGPT](https://github.com/IST-DASLab/sparsegpt) repository.
@@ -104,14 +122,3 @@ Feel free to discuss papers/code with us through issues/emails!
 
 mingjies at cs.cmu.edu  
 liuzhuangthu at gmail.com 
-
-## Citation
-If you found this work useful, please consider citing:
-```bibtex
-@article{sun2023wanda,
-  title={A Simple and Effective Pruning Approach for Large Language Models}, 
-  author={Sun, Mingjie and Liu, Zhuang and Bair, Anna and Kolter, J. Zico},
-  year={2023},
-  journal={arXiv preprint arXiv:2306.11695}
-}
-```
