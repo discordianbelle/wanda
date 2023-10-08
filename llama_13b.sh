@@ -1,19 +1,14 @@
 #!/bin/bash
 
-# Set common variables
-model="Undi95/PsyMedRP-v1-20B"
-sparsity_ratio=0.5
-cuda_device=0
-
 # Set CUDA device visibility
-export CUDA_VISIBLE_DEVICES=$cuda_device
+export CUDA_VISIBLE_DEVICES=0
 
 # Define function to run python command
 run_python_command () {
     python main.py \
-    --model $model \
+    --model Undi95/U-Amethyst-20B \
     --prune_method wanda \
     --sparsity_ratio 0.5 \
     --sparsity_type unstructured \
-    --save out/PsyMedRP/unstructured/wanda/
+    --save out/Ame/unstructured/wanda/
 }
